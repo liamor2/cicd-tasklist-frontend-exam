@@ -22,7 +22,7 @@
     "trivy:ci": "npm run trivy:build && npm run trivy:scan && npm run trivy:sbom",
     "docker:tag": "docker tag efrei-pro-pipepline-exam-frontend:latest liamor2/efrei-pro-pipepline-exam-frontend:latest",
     "docker:push": "npm run docker:tag && docker push liamor2/efrei-pro-pipepline-exam-frontend:latest",
-    "sonar:ci": "docker run --rm --user 0:0 -e SONAR_USER_HOME=/tmp/.sonar -v \"$(pwd):/usr/src\" -v \"$(basename $(pwd))_sonar-cache:/tmp/.sonar/cache\" sonarsource/sonar-scanner-cli:latest -Dsonar.host.url=\"$SONAR_HOST_URL\" -Dsonar.token=\"$SONAR_TOKEN\" -Dsonar.projectKey=\"$SONAR_PROJECT_KEY\" -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=300",
+    "sonar:ci": "npx --yes --package @sonar/scan sonar-scanner -Dsonar.host.url=\"$SONAR_HOST_URL\" -Dsonar.token=\"$SONAR_TOKEN\" -Dsonar.projectKey=\"$SONAR_PROJECT_KEY\" -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=300",
     "format": "biome format --write .",
     "format:check": "biome format .",
     "lint": "biome lint .",
