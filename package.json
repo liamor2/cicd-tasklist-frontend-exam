@@ -9,7 +9,24 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "sonar": "set -a && . ./.env && set +a && npm run sonar:ci",
+    "docker:build": "docker build -t efrei-pro-pipepline-exam-frontend:latest .",
+    "docker:up": "./scripts/docker-compose.sh up --build",
+    "docker:down": "./scripts/docker-compose.sh down",
+    "sonar:all": "npm run sonar && sh -c 'cd ../cicd-tasklist-backend && npm run sonar'",
+    "trivy": "npm run trivy:scan",
+    "trivy:build": "docker build -t efrei-pro-pipepline-exam-frontend:latest .",
+    "trivy:scan": "mkdir -p reports && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v \"$(pwd)/reports:/reports\" -v cicd-tasklist-frontend_trivy-cache:/root/.cache/trivy aquasec/trivy:latest image --scanners vuln --exit-code 1 --severity CRITICAL,HIGH --ignore-unfixed --no-progress --format json --output /reports/trivy-vulnerabilities.json efrei-pro-pipepline-exam-frontend:latest",
+    "trivy:sbom": "mkdir -p reports && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v \"$(pwd)/reports:/reports\" -v cicd-tasklist-frontend_trivy-cache:/root/.cache/trivy aquasec/trivy:latest image --format cyclonedx --output /reports/sbom.cdx.json efrei-pro-pipepline-exam-frontend:latest",
+    "trivy:ci": "npm run trivy:build && npm run trivy:scan && npm run trivy:sbom",
+    "docker:tag": "docker tag efrei-pro-pipepline-exam-frontend:latest liamor2/efrei-pro-pipepline-exam-frontend:latest",
+    "docker:push": "npm run docker:tag && docker push liamor2/efrei-pro-pipepline-exam-frontend:latest",
+    "sonar:ci": "docker run --rm --user 0:0 -e SONAR_USER_HOME=/tmp/.sonar -v \"$(pwd):/usr/src\" -v \"$(basename $(pwd))_sonar-cache:/tmp/.sonar/cache\" sonarsource/sonar-scanner-cli:latest -Dsonar.host.url=\"$SONAR_HOST_URL\" -Dsonar.token=\"$SONAR_TOKEN\" -Dsonar.projectKey=\"$SONAR_PROJECT_KEY\" -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=300",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome lint .",
+    "check": "biome ci ."
   },
   "dependencies": {
     "@emnapi/core": "^1.11.1",
@@ -18,6 +35,7 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
